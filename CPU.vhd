@@ -23,7 +23,9 @@ architecture Behavioral of CPU is
  signal adx : std_logic_vector(15 downto 0);
  signal tmp_req: std_logic_vector(50 downto 0);
  
- 
+ signal rand1:integer:=1;
+ signal rand2: std_logic_vector(15 downto 0):="0101010101010111";
+ signal rand3: std_logic_vector(31 downto 0):="10101010101010101010101010101010";
  
  file trace_file: TEXT open write_mode is "console1.txt";
  file trace_file1: TEXT open write_mode is "console2.txt";
@@ -101,24 +103,111 @@ begin
      variable logsr: string(8 downto 1);
      variable pwrcmd: std_logic_vector(1 downto 0);
      variable hwlc: std_logic_vector(1 downto 0);
-     variable rand1:integer:=1;
-      variable rand2: std_logic_vector(15 downto 0):="0101010101010111";
-      variable rand3: std_logic_vector(31 downto 0):="10101010101010101010101010101010";
     begin
     	wait for 70 ps;
     	pwrcmd := "00";
     	hwlc := "00";
     	---power(pwrcmd, tmp_req, hwlc);
-	for I in 1 to 500 loop
-	    rand1 := selection(2);
-	    rand2 := selection(2**2-1,3)&"0000000000000";
-	    rand3 := selection(2**15-1,32);
-	    if rand1=1 then
-    	   write(rand2,tmp_req,rand3);
-    	else
-    	   read(rand2,tmp_req,rand3);
+	for I in 1 to 5 loop
+    	if seed = 1 then    		 
+    		write(flag0,tmp_req,one);
+    		write(turn,tmp_req,one);
+    		read(turn, tmp_req, turn_v);
+    		read(flag1, tmp_req, flag1_v);
+    		
+    		logsr :="en0;trn:";
+    		write(line_output, logsr);
+    		write(line_output, turn_v);
+			writeline(trace_file, line_output);
+			logsr :="en0;fg1:";
+    		write(line_output, logsr);
+    		write(line_output, flag1_v);
+			writeline(trace_file, line_output);
+			
+    		while turn_v=one and flag1_v=one loop
+    			read(turn, tmp_req, turn_v);
+    			read(flag1, tmp_req, flag1_v);
+    			
+    			logsr :="in0;trn:";
+    			write(line_output, logsr);
+    			write(line_output, turn_v);
+				writeline(trace_file, line_output);
+				logsr :="in0;fg1:";
+    			write(line_output, logsr);
+    			write(line_output, flag1_v);
+				writeline(trace_file, line_output);
+    			
+    			
+    		end loop;
+			
+    		read(crit, tmp_req, crit_v);  
+    		  		
+    		crit_v:= std_logic_vector(unsigned(crit_v)+1);
+    		write(crit,tmp_req, crit_v);
+    		
+    		read(crit, tmp_req, crit_v);
+    		logsr :="1citaft:";
+    		write(line_output, logsr);
+    		write(line_output, crit_v);
+			writeline(trace_file, line_output);
+			
+    		write(flag0,tmp_req,zero);
+    	elsif seed=2 then
+    		
+    		write(flag1,tmp_req,one);
+    		
+    		
+    		write(turn,tmp_req,zero);
+    		
+    		
+    		read(turn, tmp_req, turn_v);
+    		
+    		
+    		read(flag0, tmp_req, flag0_v);
+    		
+    		
+    		logsr :="en1;trn:";
+    		write(line_output, logsr);
+    		write(line_output, turn_v);
+			writeline(trace_file1, line_output);
+			logsr :="en1;fg0:";
+    		write(line_output, logsr);
+    		write(line_output, flag0_v);
+			writeline(trace_file1, line_output);
+    		
+    		while turn_v=zero and flag0_v=one loop
+    			read(turn, tmp_req, turn_v);
+    			read(flag0, tmp_req, flag0_v);
+    			
+    		
+    			logsr :="in1;trn:";
+    			write(line_output, logsr);
+    			write(line_output, turn_v);
+				writeline(trace_file1, line_output);
+				logsr :="in1;fg0:";
+    			write(line_output, logsr);
+    			write(line_output, flag0_v);
+				writeline(trace_file1, line_output);
+				
+    		end loop;
+    		
+    		read(crit, tmp_req, crit_v); 
+    		
+    		   		
+    		crit_v:= std_logic_vector(unsigned(crit_v)+1);
+    		write(crit,tmp_req, crit_v);
+    		
+    		
+    		
+    		read(crit, tmp_req, crit_v);
+    		logsr :="2citaft:";
+    		write(line_output, logsr);
+    		write(line_output, crit_v);
+			writeline(trace_file1, line_output);
+    		
+    		write(flag1,tmp_req,zero);
+    		
     	end if;
-    	wait for 10 ps;
   end loop;	
   wait;
 
